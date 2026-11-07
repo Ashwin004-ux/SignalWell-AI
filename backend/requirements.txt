@@ -1,0 +1,36 @@
+# Core
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# Data / ML
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.1
+xgboost==2.1.1
+shap==0.46.0
+joblib==1.4.2
+
+# Supabase + auth
+supabase==2.7.4
+pyjwt==2.9.0
+
+# HTTP (for the Anthropic API call in llm_analysis_service.py)
+httpx==0.27.2
+
+# Testing
+pytest==8.3.3
+
+# Pin notes:
+# - This file was written and the code checked against pandas 3.0.2 /
+#   numpy 2.4.4 / scikit-learn 1.8.0 (what happened to be available in the
+#   sandbox this was built in) — the versions above are a conservative,
+#   compatible-with-each-other baseline for a real deployment, not
+#   necessarily what was tested. Run the test suite after installing these
+#   before trusting them in production; see backend/README.md.
+# - xgboost and shap could not be installed or exercised at all in this
+#   environment (no network access) — the code that imports them
+#   (app/ml/models/train.py's XGBoost branch, app/ml/explain/) is written
+#   against their documented APIs but is unverified. Everything else in
+#   app/ml/ was actually run against synthetic data; see tests/test_pipeline.py.

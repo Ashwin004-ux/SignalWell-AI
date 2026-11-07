@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SignalWell</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #173b32;
+      --muted: #74847d;
+      --line: #e7ece8;
+      --green: #26735c;
+      --green-dark: #164b3b;
+      --canvas: #f5f8f6;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      width: 360px;
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, a { font: inherit; }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 17px 18px 15px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(145deg, #419578, #1e644e);
+      box-shadow: 0 4px 12px #26735c2b;
+    }
+    .brand-mark svg { width: 21px; height: 21px; }
+    .brand-copy h1 { margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -.035em; }
+    .brand-copy p { margin: 3px 0 0; color: #8a9992; font-size: 9px; font-weight: 700; letter-spacing: .14em; }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 140px;
+      padding: 6px 9px;
+      overflow: hidden;
+      border: 1px solid #e1e8e3;
+      border-radius: 999px;
+      color: #66756e;
+      background: #f8faf8;
+      font-size: 10px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .status-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #a9b3ad; }
+    .status-pill.connected { border-color: #d5e9dd; color: #276c52; background: #f0f8f3; }
+    .status-pill.connected .status-dot { background: #299365; box-shadow: 0 0 0 3px #2993651c; }
+    .status-pill.paused { border-color: #f0e2c7; color: #916b2d; background: #fcf8ef; }
+    .status-pill.paused .status-dot { background: #c89843; }
+    .status-pill.disconnected { color: #8c6262; background: #fbf5f4; border-color: #efdfdd; }
+    .status-pill.disconnected .status-dot { background: #c46d67; }
+    .status-pill.error { border-color: #efdfdd; color: #98534f; background: #fff6f5; }
+    .status-pill.error .status-dot { background: #c46d67; }
+
+    main { display: flex; flex-direction: column; gap: 12px; padding: 15px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 17px 18px 15px;
+      border-radius: 17px;
+      color: #fff;
+      background: linear-gradient(135deg, #205d49 0%, #174b3b 68%, #123e32 100%);
+      box-shadow: 0 9px 22px #173b321c;
+    }
+    .hero::after {
+      position: absolute;
+      top: -50px;
+      right: -32px;
+      width: 150px;
+      height: 150px;
+      border: 1px solid #ffffff15;
+      border-radius: 50%;
+      box-shadow: 0 0 0 19px #ffffff08, 0 0 0 39px #ffffff06;
+      content: "";
+      pointer-events: none;
+    }
+    .hero-label { color: #c4e1d1; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .hero-total { margin-top: 6px; font-size: 34px; font-weight: 720; letter-spacing: -.055em; line-height: 1.12; font-variant-numeric: tabular-nums; }
+    .hero-caption { margin-top: 5px; color: #d0e4da; font-size: 11px; }
+    .coverage { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ffffff27; }
+    .coverage-labels { display: flex; align-items: center; justify-content: space-between; color: #d3e7dc; font-size: 10px; }
+    .coverage-labels strong { color: #fff; font-weight: 650; }
+    .coverage-track { height: 5px; margin-top: 8px; overflow: hidden; border-radius: 99px; background: #ffffff2b; }
+    .coverage-fill { width: 0; height: 100%; border-radius: inherit; background: #a8e5bf; transition: width .25s ease; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card {
+      min-width: 0;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .stat-top { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 600; }
+    .stat-icon { display: grid; width: 23px; height: 23px; place-items: center; border-radius: 8px; color: #2f795f; background: #edf6f0; }
+    .stat-icon svg { width: 13px; height: 13px; }
+    .stat-value { margin-top: 8px; color: var(--ink); font-size: 18px; font-weight: 700; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+
+    .tracking-card { padding: 13px 14px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .tracking-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .tracking-title { margin: 0; font-size: 12px; font-weight: 700; }
+    .tracking-detail { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.4; }
+    .tracking-state { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: #65766e; font-size: 10px; }
+    .account-email { margin: 6px 0 0 14px; overflow: hidden; color: #87948d; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .state-indicator { width: 7px; height: 7px; border-radius: 50%; background: #aab4ae; }
+    .state-indicator.active { background: #299365; }
+    .state-indicator.paused { background: #c89843; }
+
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 39px;
+      padding: 9px 10px;
+      border: 1px solid #dce4de;
+      border-radius: 11px;
+      color: #335e4e;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 650;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
+    }
+    .action:hover { border-color: #b8d1c2; background: #f7fbf8; }
+    .action:active { transform: translateY(1px); }
+    .action:focus-visible { outline: 3px solid #78bda0; outline-offset: 2px; }
+    .action.primary { grid-column: 1 / -1; border-color: var(--green); color: #fff; background: var(--green); }
+    .action.primary:hover { border-color: var(--green-dark); background: var(--green-dark); }
+    .action.primary:disabled { cursor: wait; opacity: .65; }
+    .privacy-note { display: flex; align-items: flex-start; gap: 8px; padding: 1px 3px 2px; color: #78867f; font-size: 10px; line-height: 1.5; }
+    .privacy-note svg { width: 14px; height: 14px; flex: 0 0 auto; margin-top: 1px; color: #638775; }
+    .signed-out-note { display: none; margin: 0; padding: 9px 10px; border: 1px solid #eed9d7; border-radius: 10px; color: #855552; background: #fff8f7; font-size: 11px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 17.5 9 12l3.2 3.1L20 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 7.5H20V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <div class="brand-copy"><h1>SignalWell</h1><p>DIGITAL WELLBEING</p></div>
+    </div>
+    <div class="status-pill" id="connectionPill" role="status" aria-live="polite">
+      <span class="status-dot" aria-hidden="true"></span><span id="statusText">Checking…</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="browserUsageHeading">
+      <div class="hero-label" id="browserUsageHeading">Browser usage today</div>
+      <div class="hero-total" id="totalMinutes" aria-live="polite">—</div>
+      <div class="hero-caption">Time on active sites in this browser</div>
+      <div class="coverage">
+        <div class="coverage-labels"><span>Tracking coverage</span><strong id="trackingCoverageMinutes">—</strong></div>
+        <div class="coverage-track" role="progressbar" aria-label="Daily tracking coverage" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="0">
+          <div class="coverage-fill" id="coverageFill"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Usage details">
+      <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>Social media on browser</div>
+        <div class="stat-value" id="socialMinutes">—</div>
+      </article>
+      <article class="stat-card">
+        <div class="stat-top"><span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v2m0 14v2M4.2 4.2l1.4 1.4m12.8 12.8 1.4 1.4M3 12h2m14 0h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>Late-night use</div>
+        <div class="stat-value" id="lateNightMinutes">—</div>
+      </article>
+    </section>
+
+    <section class="tracking-card" aria-labelledby="trackingTitle">
+      <div class="tracking-heading">
+        <div><h2 class="tracking-title" id="trackingTitle">Browser tracking</h2><p class="tracking-detail">You stay in control of when collection is active.</p></div>
+      </div>
+      <div class="tracking-state"><span class="state-indicator" id="trackingIndicator" aria-hidden="true"></span><span id="trackingState">Checking tracking state…</span></div>
+      <p class="account-email" id="accountEmail"></p>
+    </section>
+
+    <p class="signed-out-note" id="signedOutNote">Sign in through Privacy Settings to sync your browser activity with your dashboard.</p>
+
+    <div class="actions">
+      <button class="action primary" id="pauseBtn" type="button">Resume tracking</button>
+      <a class="action" id="dashboardLink" href="#" target="_blank" rel="noreferrer">Open dashboard</a>
+      <a class="action" id="settingsLink" href="#">Privacy settings</a>
+    </div>
+
+    <div class="privacy-note">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6l7-3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Active-site time and daily totals only. Page contents, messages, and form entries are never collected.</span>
+    </div>
+  </main>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

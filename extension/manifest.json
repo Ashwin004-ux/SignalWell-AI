@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "SignalWell AI",
+  "short_name": "SignalWell",
+  "version": "0.1.0",
+  "description": "Tracks browser activity (domain usage, time spent, late-night use) for your SignalWell AI wellbeing dashboard. Never reads page contents, keystrokes, or form data.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "idle",
+    "alarms",
+    "windows"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*"
+  ],
+  "options_page": "options.html"
+}
